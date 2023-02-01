@@ -42,6 +42,7 @@ const postSchema = new mongoose.Schema({
   can_comment: String,
   // url: String,
   // messages: Array,
+  keyword: String,
 });
 const post = mongoose.model("post", postSchema);
 

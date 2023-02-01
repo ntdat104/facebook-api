@@ -39,8 +39,8 @@ const search = async (req, res) => {
         // var postData1 =await Post.find({ described: new RegExp(keyword, "i") });
         // Tiếp theo là các kết quả đủ từ nhưng không đúng thứ tự
         var postData1 =await Post.find({$or: [
-            { described: new RegExp(keyword, "i") },
-            { described: new RegExp(keyword.replace(" ", "|"), "i") }
+            { keyword: new RegExp(keyword, "i") },
+            { keyword: new RegExp(keyword.replace(" ", "|"), "i") }
         ]}).populate({
             path: "author",
             select:"username avatar"
@@ -84,22 +84,39 @@ const search = async (req, res) => {
         }
     }
 }
-const removeAscent = (str) => {
-    if (str === null || str === undefined) return str;
-    str = str.toLowerCase();
-    str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
-    str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
-    str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
-    str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
-    str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
-    str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
-    str = str.replace(/đ/g, "d");
-    return str;
-}
+
 const getSavedSearch = async (req, res) => {
     var { token, index, count } = req.query;
     const { _id } = req.userDataPass;
     // check params
+    if(!index || !count){
+        return res.status(200).json({
+            code: statusCode.PARAMETER_IS_NOT_ENOUGHT,
+            message: statusMessage.PARAMETER_IS_NOT_ENOUGHT,
+        });
+    }
+    try{
+        index = parseInt(index);
+        count = parseInt(count);
+    }catch (e) {
+        return res.status(200).json({
+            code: statusCode.PARAMETER_TYPE_IS_INVALID,
+            message: statusMessage.PARAMETER_TYPE_IS_INVALID,
+        });
+    }
+    if(isNaN(index) || isNaN(count)){
+        return res.status(200).json({
+            code: statusCode.PARAMETER_TYPE_IS_INVALID,
+            message: statusMessage.PARAMETER_TYPE_IS_INVALID,
+        });
+    }
+    if(index < 0 || count < 0){
+        return res.status(200).json({
+            code: statusCode.PARAMETER_VALUE_IS_INVALID,
+            message: statusMessage.PARAMETER_VALUE_IS_INVALID,
+        });
+    }
+
     try {
         index = index ? index : 0;
     count = count ? count : 20;
@@ -133,9 +150,12 @@ const getSavedSearch = async (req, res) => {
 }
 
 const delSavedSearch = async (req, res) => {
-    const { token, search_id, all } = req.query;
+    var { token, search_id, all } = req.query;
     const { _id } = req.userDataPass;
     // check params
+    if(isNaN(all)){
+        all = 0;
+    }
     try {
         if(Number(all)==1){
             await User.findByIdAndUpdate(_id, {
@@ -149,6 +169,13 @@ const delSavedSearch = async (req, res) => {
             })
         }
         else if (Number(all)==0&&search_id) {
+                const userData = req.userDataPass.savedSearch.find((i) => i.id === search_id);
+                if(!userData){
+                    return res.status(500).json({
+                        code: statusCode.PARAMETER_VALUE_IS_INVALID,
+                        message: statusMessage.PARAMETER_VALUE_IS_INVALID
+                    })
+                }
             await User.findByIdAndUpdate(_id,{
                 $pull:{
                     savedSearch:{

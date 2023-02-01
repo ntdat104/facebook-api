@@ -158,10 +158,10 @@ const setReadMessage = async (req, res) => {
   const { _id } = req.userDataPass;
   try {
     var userData = req.userDataPass;
-    if (!userData || userData.blockedIds.inclules(partner_id)) {
+    if (!userData || userData.blockedIds.includes(partner_id)) {
       throw Error("nodata");
     }
-    var chatData = await Chat.findByIdA(conversation_id).populate({
+    var chatData = await Chat.findById(conversation_id).populate({
       path: "partner_id",
       select: "username avatar",
     });
