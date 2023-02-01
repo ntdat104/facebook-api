@@ -169,7 +169,10 @@ const getPost = async (req, res) => {
   const { _id } = req.userDataPass;
   try {
     if (!id) {
-      throw Error("PARAMETER_VALUE_IS_INVALID");
+      return res.status(200).json({
+        code: statusCode.PARAMETER_IS_NOT_ENOUGHT,
+        message: statusMessage.PARAMETER_IS_NOT_ENOUGHT,
+      });
     }
     var result = await Post.findOne({ _id: id }).populate({
       path: "author",
@@ -207,7 +210,6 @@ const getPost = async (req, res) => {
     }
     // }
   } catch (error) {
-    console.log(error.message);
     if (error.message == "POST_IS_NOT_EXISTED") {
       return res.status(200).json({
         code: statusCode.POST_IS_NOT_EXISTED,
@@ -235,7 +237,7 @@ const editPost = async (req, res) => {
     thumb,
     auto_block,
     auto_accept,
-  } = req.query;
+  } = req.body;
   try {
     // console.log(image_del, image_del.length, typeof image_del)
     if (
@@ -247,9 +249,12 @@ const editPost = async (req, res) => {
       throw Error("params");
     }
     const postData = await Post.findOne({ _id: id });
+
     formidableHelper
       .parse(req, postData)
       .then(async (result) => {
+        const images = req.files['images'];
+        const video = req.files['video'];
         var updateData = {};
         if (described) {
           postData.described = described;
@@ -274,9 +279,9 @@ const editPost = async (req, res) => {
           // postData.image= data2;
           // console.log(image_del, postData.image)
         }
-        if (result.type == "video") {
+        if (video) {
           cloudHelper
-            .upload(result.data[0])
+            .upload(video[0])
             .then(async (result2) => {
               updateData.video = result2;
               var editPost = await postData.save();
@@ -289,9 +294,9 @@ const editPost = async (req, res) => {
             .catch((err) => {
               throw err;
             });
-        } else if (result.type == "image") {
+        } else if (images) {
           Promise.all(
-            result.data.map((element) => {
+              images.map((element) => {
               return cloudHelper.upload(element);
             })
           ).then(async (result2) => {
@@ -307,7 +312,7 @@ const editPost = async (req, res) => {
               data: editPost,
             });
           });
-        } else if (result.type == "null") {
+        } else {
           var editPost = await postData.save();
           return res.status(200).json({
             code: statusCode.OK,

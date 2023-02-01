@@ -29,6 +29,33 @@ const getListPosts = async (req, res) => {
   } = req.query;
   const { _id } = req.userDataPass;
   // check params
+  if(!index || !count){
+    return res.status(200).json({
+      code: statusCode.PARAMETER_IS_NOT_ENOUGHT,
+      message: statusMessage.PARAMETER_IS_NOT_ENOUGHT,
+    });
+  }
+  try{
+    index = parseInt(index);
+    count = parseInt(count);
+  }catch (e) {
+    return res.status(200).json({
+      code: statusCode.PARAMETER_TYPE_IS_INVALID,
+      message: statusMessage.PARAMETER_TYPE_IS_INVALID,
+    });
+  }
+  if(isNaN(index) || isNaN(count)){
+    return res.status(200).json({
+      code: statusCode.PARAMETER_TYPE_IS_INVALID,
+      message: statusMessage.PARAMETER_TYPE_IS_INVALID,
+    });
+  }
+  if(index < 0 || count < 0){
+    return res.status(200).json({
+      code: statusCode.PARAMETER_VALUE_IS_INVALID,
+      message: statusMessage.PARAMETER_VALUE_IS_INVALID,
+    });
+  }
   try {
     // if (index || !count) {
     //   // throw Error("params");

@@ -10,7 +10,7 @@ const statusMessage = require("../constants/statusMessage.constant.js");
 const md5 = require("md5");
 
 const setBlock = async (req, res) => {
-  const { token, user_id, type } = req.query;
+  let { token, user_id, type } = req.query;
   const { _id } = req.userDataPass;
 
   try {
