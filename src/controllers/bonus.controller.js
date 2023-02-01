@@ -47,7 +47,6 @@ const setConversation = async (req, res) => {
     return res.status(200).json({
       code: statusCode.OK,
       message: statusMessage.OK,
-      server: userData.username+" want to message to "+partnerData.username,
     });
   } catch (error) {
     return res.status(500).json({

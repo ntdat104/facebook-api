@@ -106,12 +106,19 @@ const getUserInfo = async (req, res) => {
       });
     }
     // nếu xem thông tin của người khác
-    var otherUserData = await User.findById(user_id).select(
-      "username created description avatar cover_image link address city country friends blockedIds is_blocked birthday"
-    ).populate({
-      path: "friends",
-      select: "username avatar"
-    });;
+    try{
+      var otherUserData = await User.findById(user_id).select(
+          "username created description avatar cover_image link address city country friends blockedIds is_blocked birthday"
+      ).populate({
+        path: "friends",
+        select: "username avatar"
+      });
+    }catch (e) {
+      return res.status(500).json({
+        code: statusCode.USER_IS_NOT_VALIDATED,
+        message: statusMessage.USER_IS_NOT_VALIDATED,
+      });
+    }
     if (
       !otherUserData ||
       otherUserData.is_blocked ||
@@ -155,6 +162,33 @@ const getUserInfo = async (req, res) => {
 const getNotification = async (req, res) => {
   var { index, count } = req.query;
   const {_id}= req.userDataPass;
+  if(!index || !count){
+    return res.status(200).json({
+      code: statusCode.PARAMETER_IS_NOT_ENOUGHT,
+      message: statusMessage.PARAMETER_IS_NOT_ENOUGHT,
+    });
+  }
+  try{
+    index = parseInt(index);
+    count = parseInt(count);
+  }catch (e) {
+    return res.status(200).json({
+      code: statusCode.PARAMETER_TYPE_IS_INVALID,
+      message: statusMessage.PARAMETER_TYPE_IS_INVALID,
+    });
+  }
+  if(isNaN(index) || isNaN(count)){
+    return res.status(200).json({
+      code: statusCode.PARAMETER_TYPE_IS_INVALID,
+      message: statusMessage.PARAMETER_TYPE_IS_INVALID,
+    });
+  }
+  if(index < 0 || count < 0){
+    return res.status(200).json({
+      code: statusCode.PARAMETER_VALUE_IS_INVALID,
+      message: statusMessage.PARAMETER_VALUE_IS_INVALID,
+    });
+  }
   try {
     index=index?index:0; 
     count=count?count:20;

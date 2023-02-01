@@ -34,14 +34,15 @@ const deletePostAll = async (req, res)=>{
   })
 }
 const addPost = async (req, res) => {
-  console.log(req.files)
   const { token, described, state, can_edit, status } = req.query;
   const { _id } = req.userDataPass;
+  const images = req.files['images'];
+  const video = req.files['video'];
   // validate input
   try {
     var newPost;
     var result = await formidableHelper.parse(req);
-    if (result.type == "video") {
+    if (video) {
       var result2 = await cloudHelper.upload(result.data[0], "video");
       newPost = await new Post({
         described: described,
@@ -57,9 +58,9 @@ const addPost = async (req, res) => {
         author: _id,
       }).save();
      
-    } else if (result.type == "image") {
+    } else if (images) {
       var result2 = await Promise.all(
-        result.data.map((element) => {
+          images.map((element) => {
           return cloudHelper.upload(element);
         })
       );
@@ -74,6 +75,7 @@ const addPost = async (req, res) => {
         is_liked: false,
         comment: 0,
         author: _id,
+        keyword: removeAscent(described),
       }).save();
       
     } else {
@@ -87,6 +89,7 @@ const addPost = async (req, res) => {
         is_liked: false,
         comment: 0,
         author: _id,
+        keyword: removeAscent(described),
       }).save();
       
     }
@@ -131,8 +134,8 @@ const addPost = async (req, res) => {
     } catch (error) {
       console.log(error)
     }
-    
-    
+
+
   } catch (error) {
     console.log("error")
     if (error == statusCode.FILE_SIZE_IS_TOO_BIG) {
@@ -149,7 +152,18 @@ const addPost = async (req, res) => {
     }
   }
 };
-
+const removeAscent = (str) => {
+  if (str === null || str === undefined) return str;
+  str = str.toLowerCase();
+  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+  str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+  str = str.replace(/đ/g, "d");
+  return str;
+}
 const getPost = async (req, res) => {
   const { token, id } = req.query;
   const { _id } = req.userDataPass;

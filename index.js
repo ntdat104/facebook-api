@@ -46,7 +46,7 @@ app.use(bodyParser.json({ limit: "50mb" })); // for parsing application/json
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(express.json());
 var cpUpload = upload.fields([
-  { name: "images[]", maxCount: 4 },
+  { name: "images", maxCount: 4 },
   { name: "video", maxCount: 1 },
   { name: "avatar", maxCount: 1 },
   { name: "avatar[]", maxCount: 1 },
