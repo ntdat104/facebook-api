@@ -230,10 +230,8 @@ const editPost = async (req, res) => {
     described,
     status,
     state,
-    image,
     image_del,
     image_sort,
-    video,
     thumb,
     auto_block,
     auto_accept,
@@ -249,85 +247,82 @@ const editPost = async (req, res) => {
       throw Error("params");
     }
     const postData = await Post.findOne({ _id: id });
+  try {
 
-    formidableHelper
-      .parse(req, postData)
-      .then(async (result) => {
-        const images = req.files['images'];
-        const video = req.files['video'];
-        var updateData = {};
-        if (described) {
-          postData.described = described;
+    const images = req.files['images'];
+    const video = req.files['video'];
+    var updateData = {};
+    if (described) {
+      postData.described = described;
+      postData.keyword = removeAscent(described);
+    }
+    if (status) {
+      postData.status = status;
+    }
+    if (state) {
+      postData.state = state;
+    }
+    if (status) {
+      postData.status = status;
+    }
+    if (image_del && image_del.length > 0) {
+      postData.image = postData.image.filter((element) => {
+        if (image_del.includes(String(element._id))) {
+          return false;
+        } else {
+          return true;
         }
-        if (status) {
-          postData.status = status;
-        }
-        if (state) {
-          postData.state = state;
-        }
-        if (status) {
-          postData.status = status;
-        }
-        if (image_del && image_del.length > 0) {
-          postData.image = postData.image.filter((element) => {
-            if (image_del.includes(String(element._id))) {
-              return false;
-            } else {
-              return true;
-            }
-          });
-          // postData.image= data2;
-          // console.log(image_del, postData.image)
-        }
-        if (video) {
-          cloudHelper
-            .upload(video[0])
-            .then(async (result2) => {
-              updateData.video = result2;
-              var editPost = await postData.save();
-              return res.status(200).json({
-                code: statusCode.OK,
-                message: statusMessage.OK,
-                data: editPost,
-              });
-            })
-            .catch((err) => {
-              throw err;
-            });
-        } else if (images) {
-          Promise.all(
-              images.map((element) => {
-              return cloudHelper.upload(element);
-            })
-          ).then(async (result2) => {
-            // console.log(result2)
-            postData.image =
-              postData.image && postData.length == 0
-                ? result2
-                : postData.image.concat(result2);
+      });
+      // postData.image= data2;
+      // console.log(image_del, postData.image)
+    }
+    if (video) {
+      cloudHelper
+          .upload(video[0])
+          .then(async (result2) => {
+            updateData.video = result2;
             var editPost = await postData.save();
             return res.status(200).json({
               code: statusCode.OK,
               message: statusMessage.OK,
               data: editPost,
             });
+          })
+          .catch((err) => {
+            throw err;
           });
-        } else {
-          var editPost = await postData.save();
-          return res.status(200).json({
-            code: statusCode.OK,
-            message: statusMessage.OK,
-            data: editPost,
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+    } else if (images) {
+      Promise.all(
+          images.map((element) => {
+            return cloudHelper.upload(element);
+          })
+      ).then(async (result2) => {
+        // console.log(result2)
+        postData.image =
+            postData.image && postData.length == 0
+                ? result2
+                : postData.image.concat(result2);
+        var editPost = await postData.save();
         return res.status(200).json({
-          code: statusCode.FILE_SIZE_IS_TOO_BIG,
-          message: statusMessage.FILE_SIZE_IS_TOO_BIG,
+          code: statusCode.OK,
+          message: statusMessage.OK,
+          data: editPost,
         });
       });
+    } else {
+      var editPost = await postData.save();
+      return res.status(200).json({
+        code: statusCode.OK,
+        message: statusMessage.OK,
+        data: editPost,
+      });
+    }
+  }catch (e) {
+    return res.status(200).json({
+      code: statusCode.FILE_SIZE_IS_TOO_BIG,
+      message: statusMessage.FILE_SIZE_IS_TOO_BIG,
+    });
+  }
   } catch (error) {
     console.log(error);
     if (error.message == "params") {

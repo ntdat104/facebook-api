@@ -49,7 +49,7 @@ const changeInfoAfterSignup = async (req, res) => {
       throw Error("PARAMETER_VALUE_IS_INVALID")
     }
     else {
-      if(avatar[0]){
+      if(avatar){
         if (avatar[0].size > 1024 * 1024 * 4) {
           console.log("quá 4mb dung lượng tối đa cho phép");
           return res.status(200).json({
@@ -66,7 +66,7 @@ const changeInfoAfterSignup = async (req, res) => {
             message: statusMessage.FILE_SIZE_IS_TOO_BIG
           })
         }
-        const result = await cloudHelper.upload(oldpath, 'avatar'); //lưu và đổi tên file
+        const result = await cloudHelper.upload(avatar[0], 'avatar'); //lưu và đổi tên file
         // update tên user và đường dẫn avatar, thời gian sửa đổi
         const userData = await User.findByIdAndUpdate(_id, {
           $set: {
@@ -99,7 +99,7 @@ const changeInfoAfterSignup = async (req, res) => {
             username: username,
             phonenumber: phonenumber,
             created: timeCurrent,
-            avatar: req.userDataPass.avatar.url,
+            avatar: req.userDataPass.avatar,
           },
         });
       }
