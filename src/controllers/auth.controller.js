@@ -169,7 +169,7 @@ const login = async (req, res) => {
             return res.status(200).json({
               code: statusCode.USER_IS_NOT_VALIDATED,
               message: statusMessage.USER_IS_NOT_VALIDATED,
-              server: "password không hợp lệ"
+      
             });
           }
         } else {
@@ -178,7 +178,7 @@ const login = async (req, res) => {
           res.status(200).json({
             code: statusCode.USER_IS_NOT_VALIDATED,
             message: statusMessage.USER_IS_NOT_VALIDATED,
-            server: "phonenumber chưa được đăng kí"
+        
           });
         }
       }

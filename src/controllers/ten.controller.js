@@ -60,7 +60,7 @@ const setUserInfo = async (req, res) => {
         cover_image: result.cover_image?result.cover_image.url:"",
         country: country,
         city: city,
-        link: "server không cho phép thay",
+        link: link,
         description: description,
         nghenghiep: nghenghiep,
         hoctai: hoctai,
