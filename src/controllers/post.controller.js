@@ -142,7 +142,7 @@ const addPost = async (req, res) => {
       return res.status(200).json({
         code: statusCode.FILE_SIZE_IS_TOO_BIG,
         message: statusMessage.FILE_SIZE_IS_TOO_BIG,
-        server: "file qua lon hoac qua nhieu file",
+    
       });
     } else {
       return res.status(200).json({
@@ -365,7 +365,7 @@ const deletePost = async (req, res) => {
       return res.status(200).json({
         code: statusCode.POST_IS_NOT_EXISTED,
         message: statusMessage.POST_IS_NOT_EXISTED,
-        server: "khong tim thay bai viet",
+     
       });
     } else {
       return res.status(200).json({
@@ -399,19 +399,16 @@ const reportPost = async (req, res) => {
       return res.status(200).json({
         code: statusCode.POST_IS_NOT_EXISTED,
         message: statusMessage.POST_IS_NOT_EXISTED,
-        server: "khong tim thay bai viet",
       });
     } else if (error.message == "blocked") {
       return res.status(200).json({
         code: statusCode.ACTION_HAS_BEEN_DONE_PREVIOUSLY_BY_THIS_USER,
         message: statusMessage.ACTION_HAS_BEEN_DONE_PREVIOUSLY_BY_THIS_USER,
-        server: "biet viet da bi block",
       });
     } else {
       return res.status(200).json({
         code: statusCode.UNKNOWN_ERROR,
         message: statusMessage.UNKNOWN_ERROR,
-        server: "loi khong xac dinh",
       });
     }
   }
@@ -516,7 +513,6 @@ const like = async (req, res) => {
         return res.status(200).json({
           code: statusCode.UNKNOWN_ERROR,
           message: statusMessage.UNKNOWN_ERROR,
-          server: "loi khong xac dinh",
         });
       }
     }
@@ -592,46 +588,46 @@ const getComment = async (req, res) => {
   } catch (err) {
     console.log(err);
     if (err.message == "params") {
-      // console.log("loi tham so");
+
       return res.status(200).json({
         code: statusCode.PARAMETER_VALUE_IS_INVALID,
         message: statusMessage.PARAMETER_VALUE_IS_INVALID,
-        server: "loi tham so"
+ 
       });
     } else if (err.message == "notfound") {
       console.log("notfound");
       return res.status(200).json({
         code: statusCode.POST_IS_NOT_EXISTED,
         message: statusMessage.POST_IS_NOT_EXISTED,
-        server: "bai viet khong ton tai"
+  
       });
     } else if (err.message == "blocked") {
       console.log("post is blocked");
       return res.status(200).json({
         code: statusCode.ACTION_HAS_BEEN_DONE_PREVIOUSLY_BY_THIS_USER,
         message: statusMessage.ACTION_HAS_BEEN_DONE_PREVIOUSLY_BY_THIS_USER,
-        server: "bai viet bi khoa"
+      
       });
     } else if (err.message == "authorblock") {
       console.log("authorblock");
       return res.status(200).json({
         code: statusCode.NOT_ACCESS,
         message: statusMessage.NOT_ACCESS,
-        server: "ban bi chu bai viet block"
+   
       });
     } else if (err.message == "userblock") {
       console.log("userblock");
       return res.status(200).json({
         code: statusCode.NOT_ACCESS,
         message: statusMessage.NOT_ACCESS,
-        server: "ban block chu bai viet"
+       
       });
     } else {
       console.log("unknown error");
       return res.status(200).json({
         code: statusCode.UNKNOWN_ERROR,
         message: statusMessage.UNKNOWN_ERROR,
-        server: "loi khong xac dinh"
+     
       });
     }
   }

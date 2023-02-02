@@ -74,7 +74,6 @@ const unfriend = async (req, res)=>{
     res.status(200).json({
       code: statusCode.OK,
       message: statusMessage.OK,
-      server: "huỷ kết bạn thành công"
     })
   } catch (error) {
     console.log(error);
@@ -100,7 +99,6 @@ const notSuggest = async (req, res)=>{
     res.status(200).json({
       code: statusCode.OK,
       message: statusMessage.OK,
-      server: "đã thêm vào danh sách không gợi ý"
     })
   } catch (error) {
     console.log(error);

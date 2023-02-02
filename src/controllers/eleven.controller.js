@@ -80,8 +80,8 @@ const getConversation = async (req, res) => {
             conversation: [],
             is_blocked: false,
           },
-          server:
-            userData.username + " want to message to " + partnerData.username,
+        /*   server:
+            userData.username + " want to message to " + partnerData.username, */
         });
       }
       return res.status(200).json({
